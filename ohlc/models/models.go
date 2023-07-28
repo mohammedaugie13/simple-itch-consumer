@@ -74,3 +74,15 @@ func (em *EventMessage) FromJSON(msg []byte) error {
 	}
 	return nil
 }
+
+type OHLC struct {
+	OpenPrice    string `json:"open_price"`
+	HighestPrice string `json:"highest_price"`
+	LowestPrice  string `json:"lowest_price"`
+	ClosePrice   string `json:"close_price"`
+	AveragePrice string `json:"average_price"`
+	Volume       string `json:"volume"`
+	Value        string `json:"value"`
+	Prices       []int  `json:"prices"`
+	Quantities   []int  `json:"quantities"`
+}
