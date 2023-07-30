@@ -1,7 +1,9 @@
 package eventprocessor
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/exp/slices"
 	"io"
 	"log"
@@ -9,6 +11,13 @@ import (
 	"ohlc/util"
 	"strings"
 )
+
+func EventProcessor(ctx context.Context, r *redis.Client, event string, hmap *models.OHLCMap) {
+	events := ProcessEvent(event)
+	_, seen := CalculateOHLC(events, hmap)
+	SaveToRedis(ctx, r, seen, hmap)
+
+}
 
 func ProcessEvent(event string) []models.EventMessage {
 	d := json.NewDecoder(strings.NewReader(event))
@@ -29,7 +38,7 @@ func ProcessEvent(event string) []models.EventMessage {
 	return events
 }
 
-func CalculateOHLC(em []models.EventMessage, hmap *models.OHLCMap) *models.OHLCMap {
+func CalculateOHLC(em []models.EventMessage, hmap *models.OHLCMap) (*models.OHLCMap, []string) {
 	var seen []string
 	var foundOpenPrice []string
 	for _, datum := range em {
@@ -104,5 +113,13 @@ func CalculateOHLC(em []models.EventMessage, hmap *models.OHLCMap) *models.OHLCM
 		}
 
 	}
-	return hmap
+	return hmap, seen
+}
+
+func SaveToRedis(ctx context.Context, r *redis.Client, seen []string, hmap *models.OHLCMap) {
+	for _, datum := range seen {
+		details, _ := hmap.Get(datum)
+		detailsJson, _ := details.ToJSON()
+		r.HSet(ctx, datum, detailsJson)
+	}
 }

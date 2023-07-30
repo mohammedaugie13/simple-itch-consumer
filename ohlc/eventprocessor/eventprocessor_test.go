@@ -38,7 +38,7 @@ func TestNDJsonOHLC(t *testing.T) {
 {"type":"P","executed_quantity":"33","order_book":"35","execution_price":"4530","stock_code":"UNVR"}`
 	hmap := haxmap.New[string, *models.OHLC]()
 	events := ProcessEvent(data)
-	details := CalculateOHLC(events, hmap)
+	details, _ := CalculateOHLC(events, hmap)
 	for _, event := range events {
 		//t.Logf("DETAILS %v", event)
 		assert.Equal(t, event.Type, "P")
@@ -63,7 +63,7 @@ func TestNDJsonOHLC2(t *testing.T) {
 `
 	hmap := haxmap.New[string, *models.OHLC]()
 	events := ProcessEvent(data)
-	details := CalculateOHLC(events, hmap)
+	details, _ := CalculateOHLC(events, hmap)
 
 	results, _ := details.Get("BBCA")
 	assert.Equal(t, results.PreviousPrice, DecimalBig("8000"))
@@ -85,7 +85,7 @@ func TestNDJsonOHLC3(t *testing.T) {
 `
 	hmap := haxmap.New[string, *models.OHLC]()
 	events := ProcessEvent(data)
-	details := CalculateOHLC(events, hmap)
+	details, _ := CalculateOHLC(events, hmap)
 
 	results, _ := details.Get("BBCA")
 	assert.Equal(t, results.PreviousPrice, DecimalBig("8000"))
@@ -97,7 +97,7 @@ func TestNDJsonOHLC3(t *testing.T) {
 
 	data2 := `{"type":"P","quantity":"100","price":"8050","stock_code":"BBCA"}`
 	events2 := ProcessEvent(data2)
-	details2 := CalculateOHLC(events2, hmap)
+	details2, _ := CalculateOHLC(events2, hmap)
 
 	results2, _ := details2.Get("BBCA")
 	assert.Equal(t, results2.PreviousPrice, DecimalBig("8000"))
