@@ -3,10 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/alphadose/haxmap"
-	"github.com/redis/go-redis/v9"
-	"github.com/twmb/franz-go/pkg/kgo"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"ohlc/config"
@@ -14,6 +10,11 @@ import (
 	"ohlc/eventprocessor"
 	"ohlc/models"
 	s "ohlc/models/pb"
+
+	"github.com/alphadose/haxmap"
+	"github.com/redis/go-redis/v9"
+	"github.com/twmb/franz-go/pkg/kgo"
+	"google.golang.org/grpc"
 )
 
 func consumeEvent(ctx context.Context, c *kgo.Client, r *redis.Client, hmap *haxmap.Map[string, *models.OHLC]) {
@@ -26,7 +27,10 @@ func consumeEvent(ctx context.Context, c *kgo.Client, r *redis.Client, hmap *hax
 		for !iter.Done() {
 			record := iter.Next()
 			eventprocessor.EventProcessor(ctx, r, string(record.Value), hmap)
-			c.CommitRecords(ctx, record)
+			err := c.CommitRecords(ctx, record)
+			if err != nil {
+				log.Printf("Error commit message %v", err)
+			}
 		}
 	}
 }

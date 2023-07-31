@@ -14,5 +14,9 @@ type Server struct {
 
 func (s *Server) GetOHLC(ctx context.Context, message *pb.StockCode) (*pb.OHLC, error) {
 	log.Printf("Recevied %v", message.StockCode)
-	return &pb.OHLC{Value: "1000", Volume: "1000", AveragePrice: "1000", HighestPrice: "1000", LowestPrice: "1000", OpenPrice: "10000", ClosePrice: "1000", PreviousPrice: "1000"}, nil
+	details, ok := s.Map.Get(message.StockCode)
+	if !ok {
+		return &pb.OHLC{Value: "0", Volume: "0", AveragePrice: "0", HighestPrice: "0", LowestPrice: "0", OpenPrice: "0", ClosePrice: "0", PreviousPrice: "0"}, nil
+	}
+	return &pb.OHLC{Value: details.Value.String(), Volume: details.Volume.String(), AveragePrice: details.AveragePrice.String(), HighestPrice: details.HighestPrice.String(), LowestPrice: details.LowestPrice.String(), OpenPrice: details.OpenPrice.String(), ClosePrice: details.ClosePrice.String(), PreviousPrice: details.PreviousPrice.String()}, nil
 }

@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/twmb/franz-go/pkg/kgo"
 	"ohlc/util"
+
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 func RedpandaClient() *kgo.Client {
@@ -18,7 +19,6 @@ func RedpandaClient() *kgo.Client {
 	if err != nil {
 		panic(err)
 	}
-	//defer cl.Close()
 
 	return cl
 }

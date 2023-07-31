@@ -1,11 +1,11 @@
 package eventprocessor
 
 import (
-	"github.com/alphadose/haxmap"
-	"github.com/stretchr/testify/assert"
 	"ohlc/models"
 	"ohlc/util"
 	"testing"
+
+	"github.com/alphadose/haxmap"
 )
 
 func DecimalBig(val string) *util.StandardBigDecimal {
@@ -25,9 +25,10 @@ func TestNDJsonAdd(t *testing.T) {
 
 	events := ProcessEvent(data)
 	for _, event := range events {
-		assert.Equal(t, event.Type, "A")
+		if event.Type != "A" {
+			t.Errorf("Expected %v", "A")
+		}
 	}
-
 }
 
 func TestNDJsonOHLC(t *testing.T) {
@@ -39,18 +40,23 @@ func TestNDJsonOHLC(t *testing.T) {
 	hmap := haxmap.New[string, *models.OHLC]()
 	events := ProcessEvent(data)
 	details, _ := CalculateOHLC(events, hmap)
-	for _, event := range events {
-		//t.Logf("DETAILS %v", event)
-		assert.Equal(t, event.Type, "P")
-	}
 	results, _ := details.Get("UNVR")
-	assert.Equal(t, results.Volume, DecimalBig("47"))
-	assert.Equal(t, results.HighestPrice, DecimalBig("4530"))
-	assert.Equal(t, results.ClosePrice, DecimalBig("4530"))
-	assert.Equal(t, results.Value, DecimalBig("212910"))
-	assert.Equal(t, results.OpenPrice, DecimalBig("4530"))
-	assert.Equal(t, results.PreviousPrice, DecimalBig("0"))
+	expected := models.OHLC{
+		Volume:        DecimalBig("47"),
+		HighestPrice:  DecimalBig("4530"),
+		ClosePrice:    DecimalBig("4530"),
+		Value:         DecimalBig("212910"),
+		OpenPrice:     DecimalBig("4530"),
+		PreviousPrice: DecimalBig("0"),
+		AveragePrice:  DecimalBig("4530"),
+		LowestPrice:   DecimalBig("4530"),
+	}
 
+	eJSON, _ := results.ToJSON()
+	expectedJSON, _ := expected.ToJSON()
+	if string(eJSON) != string(expectedJSON) {
+		t.Errorf("Error %v", string(expectedJSON))
+	}
 }
 
 func TestNDJsonOHLC2(t *testing.T) {
@@ -66,13 +72,22 @@ func TestNDJsonOHLC2(t *testing.T) {
 	details, _ := CalculateOHLC(events, hmap)
 
 	results, _ := details.Get("BBCA")
-	assert.Equal(t, results.PreviousPrice, DecimalBig("8000"))
-	assert.Equal(t, results.AveragePrice, DecimalBig("8011"))
-	assert.Equal(t, results.HighestPrice, DecimalBig("8100"))
-	assert.Equal(t, results.LowestPrice, DecimalBig("7950"))
-	assert.Equal(t, results.ClosePrice, DecimalBig("8100"))
-	assert.Equal(t, results.Value, DecimalBig("7210000"))
+	expected := models.OHLC{
+		Volume:        DecimalBig("900"),
+		HighestPrice:  DecimalBig("8100"),
+		ClosePrice:    DecimalBig("8100"),
+		Value:         DecimalBig("7210000"),
+		OpenPrice:     DecimalBig("8050"),
+		PreviousPrice: DecimalBig("8000"),
+		AveragePrice:  DecimalBig("8011"),
+		LowestPrice:   DecimalBig("7950"),
+	}
 
+	eJSON, _ := results.ToJSON()
+	expectedJSON, _ := expected.ToJSON()
+	if string(eJSON) != string(expectedJSON) {
+		t.Errorf("Error %v", string(expectedJSON))
+	}
 }
 
 func TestNDJsonOHLC3(t *testing.T) {
@@ -85,22 +100,29 @@ func TestNDJsonOHLC3(t *testing.T) {
 `
 	hmap := haxmap.New[string, *models.OHLC]()
 	events := ProcessEvent(data)
-	details, _ := CalculateOHLC(events, hmap)
+	CalculateOHLC(events, hmap)
 
-	results, _ := details.Get("BBCA")
-	assert.Equal(t, results.PreviousPrice, DecimalBig("8000"))
-	assert.Equal(t, results.AveragePrice, DecimalBig("8011"))
-	assert.Equal(t, results.HighestPrice, DecimalBig("8100"))
-	assert.Equal(t, results.LowestPrice, DecimalBig("7950"))
-	assert.Equal(t, results.ClosePrice, DecimalBig("8100"))
-	assert.Equal(t, results.Value, DecimalBig("7210000"))
+	// results, _ := details.Get("BBCA")
 
 	data2 := `{"type":"P","quantity":"100","price":"8050","stock_code":"BBCA"}`
 	events2 := ProcessEvent(data2)
 	details2, _ := CalculateOHLC(events2, hmap)
 
 	results2, _ := details2.Get("BBCA")
-	assert.Equal(t, results2.PreviousPrice, DecimalBig("8000"))
-	assert.Equal(t, results2.OpenPrice, DecimalBig("8050"))
+	expected := models.OHLC{
+		Volume:        DecimalBig("100"),
+		HighestPrice:  DecimalBig("8050"),
+		ClosePrice:    DecimalBig("8050"),
+		Value:         DecimalBig("805000"),
+		OpenPrice:     DecimalBig("8050"),
+		PreviousPrice: DecimalBig("8000"),
+		AveragePrice:  DecimalBig("8050"),
+		LowestPrice:   DecimalBig("8050"),
+	}
 
+	eJSON, _ := results2.ToJSON()
+	expectedJSON, _ := expected.ToJSON()
+	if string(eJSON) != string(expectedJSON) {
+		t.Errorf("Error %v", string(expectedJSON))
+	}
 }

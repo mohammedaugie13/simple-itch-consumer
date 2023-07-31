@@ -9,7 +9,6 @@ type StandardBigDecimal struct {
 	d.Decimal
 }
 
-// NewLogger initializes the standard logger
 func NewDecimalFromString(str string) (*StandardBigDecimal, error) {
 	var err error
 	s := &StandardBigDecimal{d.Decimal{}}
@@ -17,7 +16,6 @@ func NewDecimalFromString(str string) (*StandardBigDecimal, error) {
 	return s, err
 }
 
-// NewLogger initializes the standard logger
 func NewDecimalFromFloat(str float64) *StandardBigDecimal {
 	s := &StandardBigDecimal{d.Decimal{}}
 	s.Decimal = d.NewFromFloat(str)

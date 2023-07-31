@@ -3,9 +3,10 @@ package models
 import (
 	"encoding/json"
 	"errors"
-	"github.com/alphadose/haxmap"
 	"log"
 	"ohlc/util"
+
+	"github.com/alphadose/haxmap"
 )
 
 const (
@@ -32,7 +33,7 @@ func (em *EventMessage) UnmarshalJSON(data []byte) error {
 	}{}
 
 	if err := json.Unmarshal(data, &obj); err != nil {
-		log.Printf("Error Load JSON")
+		log.Printf("error load json")
 		return err
 	}
 	var err error
@@ -41,12 +42,12 @@ func (em *EventMessage) UnmarshalJSON(data []byte) error {
 	if obj.Price == "" {
 		em.Price, err = util.NewDecimalFromString(obj.ExecutionPrice)
 		if err != nil {
-			return errors.New("Invalid Price")
+			return errors.New("invalid price")
 		}
 	} else {
 		em.Price, err = util.NewDecimalFromString(obj.Price)
 		if err != nil {
-			return errors.New("Invalid Price")
+			return errors.New("invalid price")
 		}
 	}
 
@@ -54,17 +55,15 @@ func (em *EventMessage) UnmarshalJSON(data []byte) error {
 		if obj.ExecutedQuantity != "" {
 			em.Quantity, err = util.NewDecimalFromString(obj.ExecutedQuantity)
 			if err != nil {
-				return errors.New("Invalid Executed Quantity")
+				return errors.New("invalid executed quantity")
 			}
 		} else {
 			em.Quantity = util.DecimalZero()
-
 		}
-
 	} else {
 		em.Quantity, err = util.NewDecimalFromString(obj.Quantity)
 		if err != nil {
-			return errors.New("Invalid Quantity")
+			return errors.New("invalid quantity")
 		}
 	}
 
@@ -126,47 +125,47 @@ func (o *OHLC) UnmarshalJSON(data []byte) error {
 		Value         string `json:"value"`
 	}{}
 	var err error
-	if err := json.Unmarshal(data, &obj); err != nil {
-		log.Printf("Error Load JSON")
+	if err = json.Unmarshal(data, &obj); err != nil {
+		log.Printf("error load json")
 		return err
 	}
 
 	o.PreviousPrice, err = util.NewDecimalFromString(obj.PreviousPrice)
 	if err != nil {
-		return errors.New("Invalid Previous Price")
+		return errors.New("invalid previous price")
 	}
 
 	o.OpenPrice, err = util.NewDecimalFromString(obj.OpenPrice)
 	if err != nil {
-		return errors.New("Invalid Open Price")
+		return errors.New("invalid open price")
 	}
 
 	o.HighestPrice, err = util.NewDecimalFromString(obj.HighestPrice)
 	if err != nil {
-		return errors.New("Invalid Highest Price")
+		return errors.New("invalid highest price")
 	}
 	o.LowestPrice, err = util.NewDecimalFromString(obj.LowestPrice)
 	if err != nil {
-		return errors.New("Invalid Lowest Price")
+		return errors.New("invalid lowest price")
 	}
 	o.ClosePrice, err = util.NewDecimalFromString(obj.ClosePrice)
 	if err != nil {
-		return errors.New("Invalid Close Price")
+		return errors.New("invalid close price")
 	}
 
 	o.AveragePrice, err = util.NewDecimalFromString(obj.AveragePrice)
 	if err != nil {
-		return errors.New("Invalid Average Price")
+		return errors.New("invalid average price")
 	}
 
 	o.Volume, err = util.NewDecimalFromString(obj.Volume)
 	if err != nil {
-		return errors.New("Invalid Volume Price")
+		return errors.New("invalid volume price")
 	}
 
 	o.Value, err = util.NewDecimalFromString(obj.Value)
 	if err != nil {
-		return errors.New("Invalid Value Price")
+		return errors.New("invalid value price")
 	}
 
 	return nil
