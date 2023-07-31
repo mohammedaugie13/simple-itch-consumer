@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "/pb";
+
+message StockCode {
+  string StockCode = 1 [json_name="stock_code"];
+}
+
+message OHLC {
+  string PreviousPrice = 1 [json_name="previous_price"];
+  string OpenPrice = 2 [json_name="open_price"];
+  string HighestPrice = 3 [json_name="highest_price"];
+  string LowestPrice = 4 [json_name="lowest_price"];
+  string ClosePrice = 5 [json_name="close_price"];
+  string AveragePrice = 6 [json_name="average_price"];
+  string Volume = 7 [json_name="volume"];
+  string Value = 8 [json_name="value"];
+}
+
+service OHLCService {
+  rpc GetOHLC(StockCode) returns (OHLC);
+}

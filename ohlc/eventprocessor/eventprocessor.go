@@ -58,7 +58,7 @@ func CalculateOHLC(em []models.EventMessage, hmap *models.OHLCMap) (*models.OHLC
 			newOHLC.HighestPrice = datum.Price
 			newOHLC.LowestPrice = datum.Price
 			newOHLC.Value = newOHLC.Value.Add(datum.Price.Mul(datum.Quantity))
-			averagePrice := details.Value.Div(newOHLC.Volume).IntPart()
+			averagePrice := newOHLC.Value.Div(newOHLC.Volume).IntPart()
 			newOHLC.AveragePrice = util.NewDecimalFromInt(averagePrice)
 			if datum.Quantity != util.DecimalZero() && !slices.Contains(foundOpenPrice, datum.StockCode) {
 				// first occurrence
